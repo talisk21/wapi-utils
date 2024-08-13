@@ -1,5 +1,4 @@
 import axios from "axios";
-import {headers} from "next/headers";
 
 const getAccessToken = async (shop: string, apiKey:string, apiSecret:string, code:string) => {
     try {
@@ -7,7 +6,10 @@ const getAccessToken = async (shop: string, apiKey:string, apiSecret:string, cod
         const response = await axios.post(tokenUrl,
             { headers: {
                 'Content-Type': 'application/json',
-                'Accept': "*/*"
+                'Accept': "*/*",
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
             }
         , data: {
             client_id: apiKey,

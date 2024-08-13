@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import {useSearchParams} from 'next/navigation';
 import Cookies from 'js-cookie';
 import getAccessToken from "@/lib/getAccessToken";
+import axios from "axios";
 
 export default function Callback() {
     const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -25,17 +26,17 @@ export default function Callback() {
                 }
 
                 try {
-                    const res = await getAccessToken(shop, apiKey, apiSecret, code);
-                    // const response = await axios.post('/api/get-access-token', {
-                    //     shop,
-                    //     apiKey,
-                    //     apiSecret,
-                    //     code
-                    // });
-                    //
-                    if (res?.status === 200) {
-                        console.log('got answer: ', res.data)
-                        setAccessToken(res.data.access_token);
+                    //const res = await getAccessToken(shop, apiKey, apiSecret, code);
+                    const response = await axios.post('/api/get-access-token', {
+                        shop,
+                        apiKey,
+                        apiSecret,
+                        code
+                    });
+
+                    if (response?.status === 200) {
+                        console.log('got answer: ', response.data)
+                        setAccessToken(response.data.access_token);
                         Cookies.remove('shop');
                         Cookies.remove('shopifyApiKey');
                         Cookies.remove('shopifyApiSecret')
@@ -43,7 +44,7 @@ export default function Callback() {
                         console.error('Failed to get access token');
                     }
 
-                    console.log('res:', res)
+                    console.log('res:', response)
                 } catch (error) {
                     console.error('Error fetching access token:', error);
                 }

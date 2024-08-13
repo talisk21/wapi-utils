@@ -2,11 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
+    }
+
     const { shop, apiKey, apiSecret, code } = req.body;
 
-    console.log('get token:', shop, apiKey, apiSecret, code);
-
-    if (!apiKey || !apiSecret || !code) {
+    if (!shop || !apiKey || !apiSecret || !code) {
         return res.status(400).json({ error: 'Missing required parameters' });
     }
 
@@ -24,6 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(500).json({ error: 'Failed to retrieve access token' });
         }
     } catch (error) {
+        console.error('Error fetching access token:', error);
         return res.status(500).json({ error: 'Error fetching access token' });
     }
 }
