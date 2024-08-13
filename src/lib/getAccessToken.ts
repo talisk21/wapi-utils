@@ -12,6 +12,11 @@ const getAccessToken = async (shop: string, apiKey:string, apiSecret:string, cod
         return response;
     } catch (error) {
         console.log('Error fetching access token' +"--"+error);
+        console.log('body: ', {
+            client_id: apiKey,
+            client_secret: apiSecret,
+            code
+        })
     }
 }
 
