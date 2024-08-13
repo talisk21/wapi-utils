@@ -17,6 +17,7 @@ const getAccessToken = async (shop: string, apiKey:string, apiSecret:string, cod
             client_secret: apiSecret,
             code
         })
+        console.log('link: ', `https://${shop}.myshopify.com/admin/oauth/access_token`)
     }
 }
 
