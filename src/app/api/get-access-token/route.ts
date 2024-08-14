@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     }
 
     try {
-        const tokenUrl = `https://${shop}.myshopify.com/admin/oauth/access_token`;
+        const tokenUrl = `https://${shop}/admin/oauth/access_token`;
         const response = await axios.post(tokenUrl, {
             client_id: apiKey,
             client_secret: apiSecret,
