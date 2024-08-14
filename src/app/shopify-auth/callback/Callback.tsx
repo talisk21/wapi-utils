@@ -9,7 +9,10 @@ export default function Callback() {
     const router = useRouter();
 
     const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [id, setId] = useState<string | null>(null);
     const code = useSearchParams().get('code') || '';
+
+    //console.log('query: ', Object.fromEntries( useSearchParams().entries() ))
 
     console.log('test: ', useSearchParams().get('code'), Object.fromEntries(useSearchParams().entries()), code)
 
@@ -27,7 +30,6 @@ export default function Callback() {
                 }
 
                 try {
-                    //const res = await getAccessToken(shop, apiKey, apiSecret, code);
                     const response = await axios.post('/api/get-access-token', {
                         shop,
                         apiKey,
@@ -38,6 +40,42 @@ export default function Callback() {
                     if (response?.status === 200) {
                         console.log('got answer: ', response.data)
                         setAccessToken(response.data.access_token);
+
+                        try {
+                            //need to send another request
+                            const res = await axios.post('/api/get-fulfillment-id', {
+                                shop,
+                                accessToken: response.data.access_token
+                            });
+
+                            console.log('response location: ', res);
+                            if (res?.status === 200) {
+                                setId(res.data.location_id);
+                            } else if (res?.status === 422) {
+                                //send get request
+                                try {
+                                    const res2 = await axios.get('/api/get-fulfillment-id');
+                                    console.log('response location 2: ', res2);
+                                    if ( res2?.status === 200 ) {
+
+                                        setId(res2.data?.location_id);
+                                    } else {
+                                        console.error('Error fetching location id 2');
+                                    }
+                                } catch (err2) {
+                                    console.error('Error fetching location id 2:', err2);
+                                }
+
+
+                            } else {
+                                //error
+                                console.error('Error fetching location id');
+                            }
+                        } catch (err) {
+                            console.error('Error fetching location id:', err);
+                        }
+
+
                         Cookies.remove('shop');
                         Cookies.remove('shopifyApiKey');
                         Cookies.remove('shopifyApiSecret')
@@ -101,6 +139,10 @@ export default function Callback() {
                     </div>
                     <br/>
                     <br/>
+                    {id ? <div>
+                        <p>Location ID: {id}</p>
+                    </div> : <p>No location id...</p>}
+                    <br />
                     <br/>
                     <div className='centered mt-24'>
                         <button className='secondary' onClick={() => router.push('/shopify-auth')}>Authenticate another user</button>
