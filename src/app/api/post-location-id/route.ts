@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         );
 
         console.log('response POST: ', response)
-        return NextResponse.json({location_id: response?.data?.fuifillment_service?.location_id, statusRes: response?.status});
+        return NextResponse.json({dataRes: {location_id: response?.data, statusRes: response?.status}});
 
         // if (response.status === 200) {
         //     return NextResponse.json({ location_id: response.data?.fulfillment_service?.location_id });
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         // }
     } catch (error) {
         console.error('Error fetching location_id POST:', error);
-        return NextResponse.json({ error: 'Error fetching location_id POST'+' -- '+error });
+        return NextResponse.json({ error: 'Error fetching location_id POST'+' -- '+error, statusRes: 422 });
     }
 }
 

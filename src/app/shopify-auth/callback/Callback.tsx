@@ -5,6 +5,16 @@ import {useRouter, useSearchParams} from 'next/navigation';
 import Cookies from 'js-cookie';
 import axios from "axios";
 
+const getLocationId = (data: any) => {
+    if (data?.fulfillment_services && data?.fulfillment_services.length) {
+        const el = data?.fulfillment_services?.filter((item: any) => item.name == 'WAPI Fulfillment');
+        if (el.length) {
+            return el[0].location_id as string;
+        }
+    }
+    return "not found";
+}
+
 export default function Callback() {
     const router = useRouter();
 
@@ -74,29 +84,34 @@ export default function Callback() {
 
                     console.log('response location: ', res);
 
-                    if (res?.data.statusRes === 200 && res?.data?.location_id) {
-                        setId(res?.data?.location_id);
-                        // if (!res.data?.location_id) {
-                        //     try {
-                        //         const res2 = await axios.post('/api/get-location-id', {
-                        //             shop,
-                        //             accessToken: accessToken
-                        //         });
-                        //
-                        //         console.log('response location 2: ', res2);
-                        //
-                        //         if (res2?.status === 200) {
-                        //
-                        //             //setId(res2.data?.location_id);
-                        //         } else {
-                        //             console.error('Error fetching location id 2');
-                        //         }
-                        //     } catch (err2) {
-                        //         console.error('Error fetching location id 2:', err2);
-                        //     }
-                        // } else {
-                        //     //setId(res.data.location_id);
-                        // }
+                    if (res?.data) {
+                        //setId(res?.data?.location_id);
+                        console.log('we got data: ', res.data);
+                        if (res.data?.dataRes?.location_id?.fulfillment_service?.location_id) {
+                            setId(res.data?.dataRes?.location_id.fulfillment_service.location_id)
+                        }
+
+                        if (!res.data?.error) {
+                            try {
+                                const res2 = await axios.post('/api/get-location-id', {
+                                    shop,
+                                    accessToken: accessToken
+                                });
+
+                                console.log('response location 2: ', res2);
+
+                                // if (res2?.status === 200) {
+                                //
+                                //     //setId(res2.data?.location_id);
+                                // } else {
+                                //     console.error('Error fetching location id 2');
+                                // }
+                            } catch (err2) {
+                                console.error('Error fetching location id 2:', err2);
+                            }
+                        } else {
+                            //setId(res.data.location_id);
+                        }
 
                     } else if (res?.data.statusRes === 422) {
                         //send get request
@@ -107,8 +122,9 @@ export default function Callback() {
                             });
                             console.log('response location 2: ', res2);
 
-                            if (res2?.data?.statusRes === 200) {
-                                setId(res2.data?.location_id);
+                            if (res2?.data?.dataRes.location_id) {
+                                console.log('calc location id', getLocationId(res2.data?.location_id));
+                                setId(getLocationId(res2.data?.location_id));
                             } else {
                                 console.error('Error fetching location id 2');
                             }

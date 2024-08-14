@@ -29,7 +29,7 @@ export async function POST(request: Request) {
             }
         );
 
-        return NextResponse.json({location_id: getLocationId(response?.data), statusRes: response?.status});
+        return NextResponse.json({dataRes: {location_id: response?.data, statusData: response?.status}});
 
         // if (response.status === 200) {
         //     return NextResponse.json({ location_id: getLocationId(response.data) });
