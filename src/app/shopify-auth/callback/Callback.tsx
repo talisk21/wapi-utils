@@ -50,7 +50,24 @@ export default function Callback() {
 
                             console.log('response location: ', res);
                             if (res?.status === 200) {
-                                setId(res.data.location_id);
+                                if (!res.data?.location_id) {
+                                    try {
+                                        const res2 = await axios.get('/api/get-fulfillment-id');
+                                        console.log('response location 2: ', res2);
+                                        if ( res2?.status === 200 ) {
+
+                                            setId(res2.data?.location_id);
+                                        } else {
+                                            console.error('Error fetching location id 2');
+                                        }
+                                    } catch (err2) {
+                                        console.error('Error fetching location id 2:', err2);
+                                    }
+                                } else {
+                                    setId(res.data.location_id);
+                                }
+
+
                             } else if (res?.status === 422) {
                                 //send get request
                                 try {
