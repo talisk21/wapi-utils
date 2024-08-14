@@ -89,7 +89,7 @@ export default function Callback() {
                         console.log('we got data: ', res.data);
                         if (res.data?.dataRes?.location_id?.fulfillment_service?.location_id) {
                             setId(res.data?.dataRes?.location_id.fulfillment_service.location_id)
-                        } else if (res.data?.dataRes?.statusRes === 422 || res.data?.dataRes?.error) {
+                        } else if (res.data?.dataRes?.statusRes === 422 || res.data?.statusRes === 422 || res.data?.dataRes?.error) {
                             //send get request
                             try {
                                 const res3 = await axios.post('/api/get-location-id', {
