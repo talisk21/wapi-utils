@@ -98,7 +98,7 @@ export default function Callback() {
                                     accessToken: accessToken
                                 });
 
-                                console.log('response location 2: ', res2);
+                                console.log('response location 2: ', res2.data);
 
                                 // if (res2?.status === 200) {
                                 //
@@ -113,27 +113,27 @@ export default function Callback() {
                             //setId(res.data.location_id);
                         }
 
-                    } else if (res?.data.statusRes === 422) {
+                    } else  {
                         //send get request
                         try {
-                            const res2 = await axios.post('/api/get-location-id', {
+                            const res3 = await axios.post('/api/get-location-id', {
                                 shop,
                                 accessToken: accessToken
                             });
-                            console.log('response location 2: ', res2);
+                            console.log('response location 2: ', res3.data);
 
-                            if (res2?.data?.dataRes.location_id) {
-                                console.log('calc location id', getLocationId(res2.data?.location_id));
-                                setId(getLocationId(res2.data?.location_id));
+                            if (res3?.data?.dataRes?.location_id) {
+                                console.log('calc location id', getLocationId(res3.data?.location_id));
+                                setId(getLocationId(res3.data?.dataRes?.location_id));
                             } else {
                                 console.error('Error fetching location id 2');
                             }
                         } catch (err2) {
                             console.error('Error fetching location id 2:', err2);
                         }
-                    } else {
-                        //error
-                        console.error('Error fetching location id');
+                    // } else {
+                    //     //error
+                    //     console.error('Error fetching location id');
                     }
                 } catch (err) {
                     console.error('Error fetching location id:', err);
