@@ -56,7 +56,7 @@ export default function Callback() {
                                         console.log('response location 2: ', res2);
                                         if ( res2?.status === 200 ) {
 
-                                            setId(res2.data?.location_id);
+                                            //setId(res2.data?.location_id);
                                         } else {
                                             console.error('Error fetching location id 2');
                                         }
@@ -64,7 +64,7 @@ export default function Callback() {
                                         console.error('Error fetching location id 2:', err2);
                                     }
                                 } else {
-                                    setId(res.data.location_id);
+                                    //setId(res.data.location_id);
                                 }
 
 
@@ -75,7 +75,7 @@ export default function Callback() {
                                     console.log('response location 2: ', res2);
                                     if ( res2?.status === 200 ) {
 
-                                        setId(res2.data?.location_id);
+                                        //setId(res2.data?.location_id);
                                     } else {
                                         console.error('Error fetching location id 2');
                                     }

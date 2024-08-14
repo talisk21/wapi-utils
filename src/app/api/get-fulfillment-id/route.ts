@@ -30,11 +30,14 @@ export async function POST(request: Request) {
             }
         );
 
-        if (response.status === 200) {
-            return NextResponse.json({ location_id: response.data?.fulfillment_service?.location_id });
-        } else {
-            return NextResponse.json({ error: 'Failed to retrieve location_id POST' });
-        }
+        console.log('response POST: ', response)
+        return NextResponse.json({data: response});
+
+        // if (response.status === 200) {
+        //     return NextResponse.json({ location_id: response.data?.fulfillment_service?.location_id });
+        // } else {
+        //     return NextResponse.json({ error: 'Failed to retrieve location_id POST' });
+        // }
     } catch (error) {
         console.error('Error fetching location_id POST:', error);
         return NextResponse.json({ error: 'Error fetching location_id POST'+' -- '+error });
@@ -69,11 +72,13 @@ export async function GET(request: Request) {
             }
         );
 
-        if (response.status === 200) {
-            return NextResponse.json({ location_id: getLocationId(response.data) });
-        } else {
-            return NextResponse.json({ error: 'Failed to retrieve location_id GET' });
-        }
+        return NextResponse.json({data: response});
+
+            // if (response.status === 200) {
+        //     return NextResponse.json({ location_id: getLocationId(response.data) });
+        // } else {
+        //     return NextResponse.json({ error: 'Failed to retrieve location_id GET' });
+        // }
     } catch (error) {
         console.error('Error fetching location_id GET:', error);
         return NextResponse.json({ error: 'Error fetching location_id GET'+' -- '+error });
