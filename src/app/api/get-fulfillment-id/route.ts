@@ -31,13 +31,13 @@ export async function POST(request: Request) {
         );
 
         if (response.status === 200) {
-            return NextResponse.json({ access_token: response.data.access_token });
+            return NextResponse.json({ location_id: response.data.location_id });
         } else {
-            return NextResponse.json({ error: 'Failed to retrieve access token' });
+            return NextResponse.json({ error: 'Failed to retrieve location_id POST' });
         }
     } catch (error) {
-        console.error('Error fetching access token:', error);
-        return NextResponse.json({ error: 'Error fetching access token'+' -- '+error });
+        console.error('Error fetching location_id POST:', error);
+        return NextResponse.json({ error: 'Error fetching location_id POST'+' -- '+error });
     }
 }
 
@@ -60,12 +60,12 @@ export async function GET(request: Request) {
         );
 
         if (response.status === 200) {
-            return NextResponse.json({ access_token: response.data.access_token });
+            return NextResponse.json({ location_id: response.data.location_id });
         } else {
-            return NextResponse.json({ error: 'Failed to retrieve access token' });
+            return NextResponse.json({ error: 'Failed to retrieve location_id GET' });
         }
     } catch (error) {
-        console.error('Error fetching access token:', error);
-        return NextResponse.json({ error: 'Error fetching access token'+' -- '+error });
+        console.error('Error fetching location_id GET:', error);
+        return NextResponse.json({ error: 'Error fetching location_id GET'+' -- '+error });
     }
 }
