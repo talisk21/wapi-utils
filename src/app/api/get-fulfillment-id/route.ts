@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         );
 
         if (response.status === 200) {
-            return NextResponse.json({ location_id: response.data.location_id });
+            return NextResponse.json({ location_id: response.data?.fulfillment_service?.location_id });
         } else {
             return NextResponse.json({ error: 'Failed to retrieve location_id POST' });
         }
@@ -39,6 +39,16 @@ export async function POST(request: Request) {
         console.error('Error fetching location_id POST:', error);
         return NextResponse.json({ error: 'Error fetching location_id POST'+' -- '+error });
     }
+}
+
+const getLocationId = (data: any) => {
+    if (data?.fulfillment_services && data?.fulfillment_services.length) {
+        const el = data?.fulfillment_services?.filter((item: any) => item.name === 'WAPI Fulfillment');
+        if (el.length) {
+            return el.location_id as string;
+        }
+    }
+    return "not found";
 }
 
 export async function GET(request: Request) {
@@ -60,7 +70,7 @@ export async function GET(request: Request) {
         );
 
         if (response.status === 200) {
-            return NextResponse.json({ location_id: response.data.location_id });
+            return NextResponse.json({ location_id: getLocationId(response.data) });
         } else {
             return NextResponse.json({ error: 'Failed to retrieve location_id GET' });
         }
