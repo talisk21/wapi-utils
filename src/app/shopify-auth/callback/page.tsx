@@ -1,5 +1,5 @@
 import {Suspense} from "react";
-import Callback from "@/app/callback/Callback";
+import Callback from "@/app/shopify-auth/callback/Callback";
 
 
 export default function CallbackPage() {
