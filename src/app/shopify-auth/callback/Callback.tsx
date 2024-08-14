@@ -89,23 +89,21 @@ export default function Callback() {
                         console.log('we got data: ', res.data);
                         if (res.data?.dataRes?.location_id?.fulfillment_service?.location_id) {
                             setId(res.data?.dataRes?.location_id.fulfillment_service.location_id)
-                        }
-
-                        if (!res.data?.error) {
+                        } else if (res.data?.dataRes?.statusRes === 422 || res.data?.dataRes?.error) {
+                            //send get request
                             try {
-                                const res2 = await axios.post('/api/get-location-id', {
+                                const res3 = await axios.post('/api/get-location-id', {
                                     shop,
                                     accessToken: accessToken
                                 });
+                                console.log('response location 2: ', res3.data);
 
-                                console.log('response location 2: ', res2.data);
-
-                                // if (res2?.status === 200) {
-                                //
-                                //     //setId(res2.data?.location_id);
-                                // } else {
-                                //     console.error('Error fetching location id 2');
-                                // }
+                                if (res3?.data?.dataRes?.location_id) {
+                                    console.log('calc location id', getLocationId(res3.data?.location_id));
+                                    setId(getLocationId(res3.data?.dataRes?.location_id));
+                                } else {
+                                    console.error('Error fetching location id 2');
+                                }
                             } catch (err2) {
                                 console.error('Error fetching location id 2:', err2);
                             }
