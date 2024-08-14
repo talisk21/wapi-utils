@@ -3,9 +3,9 @@ import axios from "axios";
 
 const getLocationId = (data: any) => {
     if (data?.fulfillment_services && data?.fulfillment_services.length) {
-        const el = data?.fulfillment_services?.filter((item: any) => item.name === 'WAPI Fulfillment');
+        const el = data?.fulfillment_services?.filter((item: any) => item.name == 'WAPI Fulfillment');
         if (el.length) {
-            return el.location_id as string;
+            return el[0].location_id as string;
         }
     }
     return "not found";
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
             }
         );
 
-        return NextResponse.json({dataa: {dataRes: response?.data, statusData: response?.status}});
+        return NextResponse.json({location_id: getLocationId(response?.data), statusRes: response?.status});
 
         // if (response.status === 200) {
         //     return NextResponse.json({ location_id: getLocationId(response.data) });

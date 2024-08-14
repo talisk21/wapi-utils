@@ -18,8 +18,6 @@ export default function Callback() {
     const apiKey = Cookies.get('shopifyApiKey') as string;
     const apiSecret = Cookies.get('shopifyApiSecret') as string;
 
-    console.log('test: ', useSearchParams().get('code'), Object.fromEntries(useSearchParams().entries()), code)
-
     useEffect(() => {
         if (code) {
             console.log('codeee', code)
@@ -69,36 +67,38 @@ export default function Callback() {
             console.log('--fetching location id--');
             const fetchLocationId = async () => {
                 try {
-                    //need to send another request
                     const res = await axios.post('/api/post-location-id', {
                         shop,
                         accessToken
                     });
 
                     console.log('response location: ', res);
-                    if (res?.status === 200) {
-                        if (!res.data?.location_id) {
-                            try {
-                                const res2 = await axios.post('/api/get-location-id', {
-                                    shop,
-                                    accessToken: accessToken
-                                });
-                                console.log('response location 2: ', res2);
-                                if (res2?.status === 200) {
 
-                                    //setId(res2.data?.location_id);
-                                } else {
-                                    console.error('Error fetching location id 2');
-                                }
-                            } catch (err2) {
-                                console.error('Error fetching location id 2:', err2);
-                            }
-                        } else {
-                            //setId(res.data.location_id);
-                        }
+                    if (res?.data.statusRes === 200 && res?.data?.location_id) {
+                        setId(res?.data?.location_id);
+                        // if (!res.data?.location_id) {
+                        //     try {
+                        //         const res2 = await axios.post('/api/get-location-id', {
+                        //             shop,
+                        //             accessToken: accessToken
+                        //         });
+                        //
+                        //         console.log('response location 2: ', res2);
+                        //
+                        //         if (res2?.status === 200) {
+                        //
+                        //             //setId(res2.data?.location_id);
+                        //         } else {
+                        //             console.error('Error fetching location id 2');
+                        //         }
+                        //     } catch (err2) {
+                        //         console.error('Error fetching location id 2:', err2);
+                        //     }
+                        // } else {
+                        //     //setId(res.data.location_id);
+                        // }
 
-
-                    } else {
+                    } else if (res?.data.statusRes === 422) {
                         //send get request
                         try {
                             const res2 = await axios.post('/api/get-location-id', {
@@ -107,20 +107,17 @@ export default function Callback() {
                             });
                             console.log('response location 2: ', res2);
 
-                            if (res2?.status === 200) {
-
-                                //setId(res2.data?.location_id);
+                            if (res2?.data?.statusRes === 200) {
+                                setId(res2.data?.location_id);
                             } else {
                                 console.error('Error fetching location id 2');
                             }
                         } catch (err2) {
                             console.error('Error fetching location id 2:', err2);
                         }
-
-
-                        // } else {
-                        //     //error
-                        //     console.error('Error fetching location id');
+                    } else {
+                        //error
+                        console.error('Error fetching location id');
                     }
                 } catch (err) {
                     console.error('Error fetching location id:', err);
