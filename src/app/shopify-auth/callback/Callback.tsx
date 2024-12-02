@@ -22,8 +22,6 @@ export default function Callback() {
     const [id, setId] = useState<string | null>(null);
     const code = useSearchParams().get('code') || '';
 
-    //console.log('query: ', Object.fromEntries( useSearchParams().entries() ))
-
     const shop = Cookies.get("shop") as string;
     const apiKey = Cookies.get('shopifyApiKey') as string;
     const apiSecret = Cookies.get('shopifyApiSecret') as string;
@@ -53,9 +51,6 @@ export default function Callback() {
                         console.log('got answer: ', response.data)
                         setAccessToken(response.data.access_token);
 
-                        // Cookies.remove('shop');
-                        // Cookies.remove('shopifyApiKey');
-                        // Cookies.remove('shopifyApiSecret')
                     } else {
                         console.error('Failed to get access token');
                     }
