@@ -1,15 +1,15 @@
 import {NextResponse} from "next/server";
 import axios from "axios";
 
-const getLocationId = (data: any) => {
-    if (data?.fulfillment_services && data?.fulfillment_services.length) {
-        const el = data?.fulfillment_services?.filter((item: any) => item.name == 'WAPI Fulfillment');
-        if (el.length) {
-            return el[0].location_id as string;
-        }
-    }
-    return "not found";
-}
+// const getLocationId = (data: any) => {
+//     if (data?.fulfillment_services && data?.fulfillment_services.length) {
+//         const el = data?.fulfillment_services?.filter((item: any) => item.name == 'WAPI Fulfillment');
+//         if (el.length) {
+//             return el[0].location_id as string;
+//         }
+//     }
+//     return "not found";
+// }
 
 export async function POST(request: Request) {
     const { shop, accessToken } = await request.json();
@@ -30,12 +30,6 @@ export async function POST(request: Request) {
         );
 
         return NextResponse.json({dataRes: {location_id: response?.data, statusData: response?.status}});
-
-        // if (response.status === 200) {
-        //     return NextResponse.json({ location_id: getLocationId(response.data) });
-        // } else {
-        //     return NextResponse.json({ error: 'Failed to retrieve location_id GET' });
-        // }
     } catch (error) {
         console.error('Error fetching location_id GET:', error);
         return NextResponse.json({ error: 'Error fetching location_id GET'+' -- '+error });
