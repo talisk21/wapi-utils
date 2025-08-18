@@ -7,7 +7,7 @@ import axios from "axios";
 
 const getLocationId = (data: any) => {
     if (data?.fulfillment_services && data?.fulfillment_services.length) {
-        const el = data?.fulfillment_services?.filter((item: any) => item.name == 'WAPI Fulfillment');
+        const el = data?.fulfillment_services?.filter((item: any) => item.name == 'Fulfillment location');
         if (el.length) {
             return el[0].location_id as string;
         }

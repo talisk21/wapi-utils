@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         const response = await axios.post(tokenUrl,
             {
                 "fulfillment_service": {
-                    "name": "WAPI Fulfillment",
+                    "name": "Fulfillment location",
                     "callback_url": "https://wapi-utils.vercel.app/callback/",
                     "inventory_management": true,
                     "tracking_support": true,
