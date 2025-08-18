@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server';
 import {supabase} from "@/lib/supabase";
 
-const LOGGING_ENABLED = String(process.env.LOGGING_ENABLED || "").toLowerCase() === "true";
+const LOGGING_ENABLED = true;
 
 async function writeApiLog(req: Request, startedAt: number) {
     if (!LOGGING_ENABLED) return;
