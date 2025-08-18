@@ -12,13 +12,27 @@ const LOGGING_ENABLED = true;
 async function writeApiLog(req: Request, startedAt: number, status: number) {
     if (!LOGGING_ENABLED) return;
     try {
+        let body: any = null;
+
+        // Attempt JSON first, fallback to text
+        try {
+            body = await req.clone().json();
+        } catch {
+            try {
+                body = await req.clone().text();
+            } catch {
+                body = null;
+            }
+        }
+
         const entry = {
             method: req.method,
             path: new URL(req.url).pathname,
-            status,                                   // ✅ number, not string
+            status,
             duration_ms: Date.now() - startedAt,
             user_agent: req.headers.get("user-agent"),
             ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+            req: body,
         };
 
         // For debugging: await and log error/result
