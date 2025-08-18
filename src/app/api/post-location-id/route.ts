@@ -14,7 +14,7 @@ export async function POST(request: Request) {
             {
                 "fulfillment_service": {
                     "name": "WAPI Fulfillment",
-                    "callback_url": "https://wapi-shopify.azurewebsites.net/",
+                    "callback_url": "https://wapi-utils.vercel.app/callback/",
                     "inventory_management": true,
                     "tracking_support": true,
                     "requires_shipping_method": false,
