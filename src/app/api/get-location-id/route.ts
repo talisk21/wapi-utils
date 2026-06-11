@@ -1,5 +1,4 @@
 import {NextResponse} from "next/server";
-import axios from "axios";
 
 // const getLocationId = (data: any) => {
 //     if (data?.fulfillment_services && data?.fulfillment_services.length) {
@@ -20,16 +19,15 @@ export async function POST(request: Request) {
 
     try {
         const tokenUrl = `https://${shop}/admin/api/2023-01/fulfillment_services.json`;
-        const response = await axios.get(tokenUrl,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Shopify-Access-Token': accessToken
-                }
+        const response = await fetch(tokenUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Shopify-Access-Token': accessToken
             }
-        );
+        });
 
-        return NextResponse.json({dataRes: {location_id: response?.data, statusData: response?.status}});
+        const data = await response.json();
+        return NextResponse.json({dataRes: {location_id: data, statusData: response.status}});
     } catch (error) {
         console.error('Error fetching location_id GET:', error);
         return NextResponse.json({ error: 'Error fetching location_id GET'+' -- '+error });

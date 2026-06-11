@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
 
 export async function POST(request: Request) {
     const { shop, accessToken } = await request.json();
@@ -10,8 +9,13 @@ export async function POST(request: Request) {
 
     try {
         const tokenUrl = `https://${shop}/admin/api/2023-01/fulfillment_services.json`;
-        const response = await axios.post(tokenUrl,
-            {
+        const response = await fetch(tokenUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Shopify-Access-Token': accessToken
+            },
+            body: JSON.stringify({
                 "fulfillment_service": {
                     "name": "Fulfillment location",
                     "callback_url": "https://wapi-utils.vercel.app/callback/",
@@ -22,16 +26,12 @@ export async function POST(request: Request) {
                     "fulfillment_orders_opt_in":true,
                     "permits_sku_sharing":true
                 }
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Shopify-Access-Token': accessToken
-                }
-            }
-        );
+            })
+        });
 
+        const data = await response.json();
         console.log('response POST: ', response)
-        return NextResponse.json({dataRes: {location_id: response?.data, statusRes: response?.status}});
+        return NextResponse.json({dataRes: {location_id: data, statusRes: response.status}});
 
         // if (response.status === 200) {
         //     return NextResponse.json({ location_id: response.data?.fulfillment_service?.location_id });
@@ -43,4 +43,3 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Error fetching location_id POST'+' -- '+error, statusRes: 422 });
     }
 }
-

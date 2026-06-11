@@ -3,7 +3,15 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
 import Cookies from 'js-cookie';
-import axios from "axios";
+const fetchPost = async (url: string, body: any) => {
+    const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    const data = await r.json().catch(() => null);
+    return { data, status: r.status };
+};
 
 const getLocationId = (data: any) => {
     if (data?.fulfillment_services && data?.fulfillment_services.length) {
@@ -40,7 +48,7 @@ export default function Callback() {
                 }
 
                 try {
-                    const response = await axios.post('/api/get-access-token', {
+                    const response = await fetchPost('/api/get-access-token', {
                         shop,
                         apiKey,
                         apiSecret,
@@ -72,7 +80,7 @@ export default function Callback() {
             console.log('--fetching location id--');
             const fetchLocationId = async () => {
                 try {
-                    const res = await axios.post('/api/post-location-id', {
+                    const res = await fetchPost('/api/post-location-id', {
                         shop,
                         accessToken
                     });
@@ -87,7 +95,7 @@ export default function Callback() {
                         } else if (res.data?.dataRes?.statusRes === 422 || res.data?.statusRes === 422 || res.data?.dataRes?.error) {
                             //send get request
                             try {
-                                const res3 = await axios.post('/api/get-location-id', {
+                                const res3 = await fetchPost('/api/get-location-id', {
                                     shop,
                                     accessToken: accessToken
                                 });
@@ -109,7 +117,7 @@ export default function Callback() {
                     } else  {
                         //send get request
                         try {
-                            const res3 = await axios.post('/api/get-location-id', {
+                            const res3 = await fetchPost('/api/get-location-id', {
                                 shop,
                                 accessToken: accessToken
                             });

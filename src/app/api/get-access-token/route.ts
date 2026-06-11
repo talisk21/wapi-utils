@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
 
 export async function POST(request: Request) {
     const { shop, apiKey, apiSecret, code } = await request.json();
@@ -10,14 +9,21 @@ export async function POST(request: Request) {
 
     try {
         const tokenUrl = `https://${shop}/admin/oauth/access_token`;
-        const response = await axios.post(tokenUrl, {
-            client_id: apiKey,
-            client_secret: apiSecret,
-            code
+        const response = await fetch(tokenUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                client_id: apiKey,
+                client_secret: apiSecret,
+                code
+            })
         });
 
-        if (response.status === 200) {
-            return NextResponse.json({ access_token: response.data.access_token });
+        if (response.ok) {
+            const data = await response.json();
+            return NextResponse.json({ access_token: data.access_token });
         } else {
             return NextResponse.json({ error: 'Failed to retrieve access token' });
         }
