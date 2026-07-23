@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 // import { supabase } from '@/lib/supabase'; // Import the Supabase client
 
 // We will use mock credentials for now as requested.
-const CLIENT_ID = 'mock_client_id';
-const CLIENT_SECRET = 'mock_client_secret';
+const CLIENT_ID = 'a2537f33-16e3-4ffa-9036-89b3318d3331';
+const CLIENT_SECRET = 'cjXRKjuRDbh4l4S8ESQ1xQDADF3GOyz0sWA9ulZt';
 const TOKEN_URL = 'https://oauth2.api.jtl-software.com/token';
 
 export async function GET(request: NextRequest) {
@@ -46,25 +46,6 @@ export async function GET(request: NextRequest) {
 
     // Success! We have the access_token and refresh_token
     const { access_token, refresh_token, expires_in } = data;
-    
-    // TODO: Uncomment this when you're ready to save to Supabase
-    /*
-    const { error: dbError } = await supabase
-      .from('ffn_tokens')
-      .insert([
-        {
-          access_token,
-          refresh_token,
-          expires_at: new Date(Date.now() + expires_in * 1000).toISOString(),
-          // You might also want to save a merchant ID or user ID here so you know who these tokens belong to
-        }
-      ]);
-
-    if (dbError) {
-      console.error('Error saving tokens to Supabase:', dbError);
-      return NextResponse.json({ error: 'Failed to save tokens to database.' }, { status: 500 });
-    }
-    */
 
     console.log('Successfully received tokens from JTL FFN:', {
       hasAccessToken: !!access_token,
@@ -72,10 +53,17 @@ export async function GET(request: NextRequest) {
       expires_in
     });
 
-    // Return a success response (returning data for debugging purposes)
-    return NextResponse.json({
-      message: 'Successfully authenticated with JTL FFN!',
-      data
+    // Return a simple HTML response so it's very easy to read and copy on the screen
+    return new NextResponse(`
+      <html lang="en" style="font-family: monospace; padding: 20px;">
+        <body>
+          <h2>Tokens successfully generated</h2>
+          <p>You can copy them below:</p>
+          <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px;">${JSON.stringify(data, null, 2)}</pre>
+        </body>
+      </html>
+    `, {
+      headers: { 'Content-Type': 'text/html' }
     });
 
   } catch (error) {
