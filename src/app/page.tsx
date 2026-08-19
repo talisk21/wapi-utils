@@ -15,6 +15,9 @@ export default function Home() {
             <li className='is-link' onClick={()=>router.push('/shopify-auth')}>
               Shopify authentication
             </li>
+            <li className='is-link' onClick={()=>router.push('/tiktok-callback')}>
+              TikTok Registration Callback
+            </li>
           </ul>
         </div>
       </main>
