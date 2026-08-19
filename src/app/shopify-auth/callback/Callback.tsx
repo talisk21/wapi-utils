@@ -3,25 +3,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
 import Cookies from 'js-cookie';
-const fetchPost = async (url: string, body: any) => {
-    const r = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-    });
-    const data = await r.json().catch(() => null);
-    return { data, status: r.status };
-};
-
-const getLocationId = (data: any) => {
-    if (data?.fulfillment_services && data?.fulfillment_services.length) {
-        const el = data?.fulfillment_services?.filter((item: any) => item.name == 'Fulfillment location');
-        if (el.length) {
-            return el[0].location_id as string;
-        }
-    }
-    return "not found";
-}
+import { fetchPost, getLocationId } from '@/utils/api';
 
 export default function Callback() {
     const router = useRouter();

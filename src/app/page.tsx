@@ -11,12 +11,12 @@ export default function Home() {
         <h1>WAPI UTILS</h1>
 
         <div className='main-wrapper'>
-          <ul>
-            <li className='is-link' onClick={()=>router.push('/shopify-auth')}>
+          <ul style={{paddingTop: '16px'}}>
+            <li className='is-link' style={{paddingBottom: '16px'}} onClick={()=>router.push('/shopify-auth')}>
               Shopify authentication
             </li>
-            <li className='is-link' onClick={()=>router.push('/tiktok-callback')}>
-              TikTok Registration Callback
+            <li className='is-link' onClick={()=>router.push('/tiktok-auth')}>
+              TikTok authentication
             </li>
           </ul>
         </div>
