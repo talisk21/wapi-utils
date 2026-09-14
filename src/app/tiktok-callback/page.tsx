@@ -2,12 +2,11 @@ import { cookies } from 'next/headers';
 import TokenDisplay from '@/components/TokenDisplay';
 import ClearCookies from '@/components/ClearCookies';
 
-export default async function TiktokCallbackPage({
-    searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined };
+export default async function TiktokCallbackPage(props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const cookieStore = cookies();
+    const searchParams = await props.searchParams;
+    const cookieStore = await cookies();
     const appKey = cookieStore.get('tiktokAppKey')?.value;
     const appSecret = cookieStore.get('tiktokAppSecret')?.value;
     

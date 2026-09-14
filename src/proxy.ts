@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function middleware() {
+export async function proxy() {
     // const loggingApiUrl = 'https://api.wapi.com/API/hs/v1/Services/Shopify/Callback'; // Replace with your logging server URL
     //
     // // Extract request details
