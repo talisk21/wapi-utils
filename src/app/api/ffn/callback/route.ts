@@ -49,6 +49,7 @@ async function handleCallback(request: NextRequest) {
       user_agent: userAgent,
       ip,
       req: {
+        timestamp: new Date().toISOString(),
         query: queryParams,
         headers,
         body,
@@ -93,6 +94,7 @@ async function handleCallback(request: NextRequest) {
         user_agent: userAgent,
         ip,
         req: {
+          timestamp: new Date().toISOString(),
           query: queryParams,
           headers,
           body,
@@ -124,6 +126,7 @@ async function handleCallback(request: NextRequest) {
       user_agent: userAgent,
       ip,
       req: {
+        timestamp: new Date().toISOString(),
         query: queryParams,
         headers,
         body,
@@ -161,6 +164,7 @@ async function handleCallback(request: NextRequest) {
       user_agent: userAgent,
       ip,
       req: {
+        timestamp: new Date().toISOString(),
         query: queryParams,
         headers,
         body,

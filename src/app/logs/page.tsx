@@ -152,6 +152,7 @@ export default function LogsPage() {
     if (!isoDate) return '-';
     try {
       const d = new Date(isoDate);
+      if (isNaN(d.getTime())) return isoDate;
       return d.toLocaleString('en-GB', {
         day: '2-digit',
         month: '2-digit',
@@ -163,6 +164,10 @@ export default function LogsPage() {
     } catch {
       return isoDate;
     }
+  };
+
+  const getLogTimestamp = (log: ApiLog) => {
+    return log.created_at || log.req?.timestamp || (log as any).timestamp || (log as any).date || (log as any).inserted_at;
   };
 
   return (
@@ -306,7 +311,7 @@ export default function LogsPage() {
 
                     {/* Timestamp */}
                     <td style={{ padding: '12px 14px', color: '#cbd5e0', whiteSpace: 'nowrap' }}>
-                      {formatDate(log.created_at)}
+                      {formatDate(getLogTimestamp(log))}
                     </td>
 
                     {/* Source Badge */}
@@ -427,7 +432,7 @@ export default function LogsPage() {
                     Log #{activeLog.id} Details
                   </h3>
                   <span style={{ fontSize: '12px', color: '#a0aec0' }}>
-                    {activeLog.method} {activeLog.path} &bull; Received at {formatDate(activeLog.created_at)}
+                    {activeLog.method} {activeLog.path} &bull; Received at {formatDate(getLogTimestamp(activeLog))}
                   </span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>

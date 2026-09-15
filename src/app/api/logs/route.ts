@@ -9,9 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     let query = supabase
       .from('api_logs')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .limit(limit);
+      .select('*', { count: 'exact' });
 
     if (filter === 'ffn') {
       query = query.ilike('path', '%/api/ffn%');
@@ -19,11 +17,24 @@ export async function GET(request: NextRequest) {
       query = query.ilike('path', '%/callback%').not('path', 'ilike', '%/api/ffn%');
     }
 
-    const { data, count, error } = await query;
+    // Try ordering by 'id' descending first; if that fails, query without ordering
+    let { data, count, error } = await query.order('id', { ascending: false }).limit(limit);
+
+    if (error) {
+      console.warn('Ordering by id failed, falling back to unordered query:', error.message);
+      const fallback = await query.limit(limit);
+      data = fallback.data;
+      count = fallback.count;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error('Error fetching logs from Supabase:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (data && data.length > 0) {
+      console.log('Sample api_logs row columns:', Object.keys(data[0]));
     }
 
     return NextResponse.json({ logs: data || [], count: count || (data ? data.length : 0) });
