@@ -2,6 +2,7 @@ import { supabase } from "./supabase";
 
 export interface ApiLogEntry {
     id?: number | string;
+    ts?: string | null;
     time?: string | null;
     created_at?: string;
     method?: string | null;

@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 interface ApiLog {
   id: string | number;
+  ts?: string | null;
   time?: string | null;
   created_at?: string;
   method?: string | null;
@@ -168,7 +169,7 @@ export default function LogsPage() {
   };
 
   const getLogTimestamp = (log: ApiLog) => {
-    return log.time || log.created_at || log.req?.timestamp || (log as any).timestamp || (log as any).date || (log as any).inserted_at;
+    return log.ts || log.time || log.created_at || log.req?.timestamp || (log as any).timestamp || (log as any).date || (log as any).inserted_at;
   };
 
   return (

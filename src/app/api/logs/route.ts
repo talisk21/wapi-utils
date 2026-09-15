@@ -17,11 +17,11 @@ export async function GET(request: NextRequest) {
       query = query.ilike('path', '%/callback%').not('path', 'ilike', '%/api/ffn%');
     }
 
-    // Try ordering by 'time' descending first; if that fails, try 'id', then query without ordering
-    let { data, count, error } = await query.order('time', { ascending: false }).limit(limit);
+    // Try ordering by 'ts' descending first; if that fails, try 'id', then query without ordering
+    let { data, count, error } = await query.order('ts', { ascending: false }).limit(limit);
 
     if (error) {
-      console.warn('Ordering by time failed, falling back to id:', error.message);
+      console.warn('Ordering by ts failed, falling back to id:', error.message);
       const resId = await query.order('id', { ascending: false }).limit(limit);
       if (!resId.error) {
         data = resId.data;

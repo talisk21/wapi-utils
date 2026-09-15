@@ -42,7 +42,7 @@ async function handleCallback(request: NextRequest) {
     const status = 400;
 
     await insertApiLog({
-      time: new Date().toISOString(),
+      ts: new Date().toISOString(),
       method: request.method,
       path: request.nextUrl.pathname,
       status,
@@ -88,7 +88,7 @@ async function handleCallback(request: NextRequest) {
       const status = response.status;
 
       await insertApiLog({
-        time: new Date().toISOString(),
+        ts: new Date().toISOString(),
         method: request.method,
         path: request.nextUrl.pathname,
         status,
@@ -121,7 +121,7 @@ async function handleCallback(request: NextRequest) {
 
     // Log the successful outcome
     await insertApiLog({
-      time: new Date().toISOString(),
+      ts: new Date().toISOString(),
       method: request.method,
       path: request.nextUrl.pathname,
       status: 200,
@@ -160,7 +160,7 @@ async function handleCallback(request: NextRequest) {
     const status = 500;
 
     await insertApiLog({
-      time: new Date().toISOString(),
+      ts: new Date().toISOString(),
       method: request.method,
       path: request.nextUrl.pathname,
       status,
