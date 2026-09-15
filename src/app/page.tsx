@@ -15,8 +15,11 @@ export default function Home() {
             <li className='is-link' style={{paddingBottom: '16px'}} onClick={()=>router.push('/shopify-auth')}>
               Shopify authentication
             </li>
-            <li className='is-link' onClick={()=>router.push('/tiktok-auth')}>
+            <li className='is-link' style={{paddingBottom: '16px'}} onClick={()=>router.push('/tiktok-auth')}>
               TikTok authentication
+            </li>
+            <li className='is-link' onClick={()=>router.push('/logs')}>
+              Callback & API logs
             </li>
           </ul>
         </div>
