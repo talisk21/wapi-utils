@@ -17,15 +17,22 @@ export async function GET(request: NextRequest) {
       query = query.ilike('path', '%/callback%').not('path', 'ilike', '%/api/ffn%');
     }
 
-    // Try ordering by 'id' descending first; if that fails, query without ordering
-    let { data, count, error } = await query.order('id', { ascending: false }).limit(limit);
+    // Try ordering by 'time' descending first; if that fails, try 'id', then query without ordering
+    let { data, count, error } = await query.order('time', { ascending: false }).limit(limit);
 
     if (error) {
-      console.warn('Ordering by id failed, falling back to unordered query:', error.message);
-      const fallback = await query.limit(limit);
-      data = fallback.data;
-      count = fallback.count;
-      error = fallback.error;
+      console.warn('Ordering by time failed, falling back to id:', error.message);
+      const resId = await query.order('id', { ascending: false }).limit(limit);
+      if (!resId.error) {
+        data = resId.data;
+        count = resId.count;
+        error = null;
+      } else {
+        const fallback = await query.limit(limit);
+        data = fallback.data;
+        count = fallback.count;
+        error = fallback.error;
+      }
     }
 
     if (error) {

@@ -7,7 +7,8 @@ const supabase = createClient(
     { auth: { persistSession: false, autoRefreshToken: false } }
 );
 
-const LOGGING_ENABLED = true;
+// const LOGGING_ENABLED = true;
+const LOGGING_ENABLED = false;
 
 async function writeApiLog(req: Request, startedAt: number, status: number) {
     if (!LOGGING_ENABLED) return;
@@ -48,18 +49,18 @@ async function writeApiLog(req: Request, startedAt: number, status: number) {
 }
 
 export async function POST(req: Request) {
-    const started = Date.now();
+    // const started = Date.now();
     const status = 200;
     const res = NextResponse.json({ ok: true, message: "Success" }, { status });
-    await writeApiLog(req, started, status);
+    // await writeApiLog(req, started, status); // Shopify logging commented out
     return res;
 }
 
 // (Optional) Add GET to test easily from browser/Postman:
 export async function GET(req: Request) {
-    const started = Date.now();
+    // const started = Date.now();
     const status = 200;
     const res = NextResponse.json({ ok: true, message: "Success" }, { status });
-    await writeApiLog(req, started, status);
+    // await writeApiLog(req, started, status); // Shopify logging commented out
     return res;
 }
