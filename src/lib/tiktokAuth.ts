@@ -82,7 +82,15 @@ export async function exchangeCodeForTokensWithSDK(
     appSecret: string
 ): Promise<TikTokTokenResponse> {
     const res = await AccessTokenTool.getAccessToken(authCode, appKey, appSecret);
-    return res.body as TikTokTokenResponse;
+    let body = res.body as any;
+    if (typeof body === 'string') {
+        try {
+            body = JSON.parse(body);
+        } catch (e) {
+            console.error('Failed to parse token response string:', e);
+        }
+    }
+    return body as TikTokTokenResponse;
 }
 
 /**
@@ -99,7 +107,15 @@ export async function getAuthorizedShopsWithSDK(
         accessToken,
         'application/json'
     );
-    return result.body as TikTokShopsResponse;
+    let body = result.body as any;
+    if (typeof body === 'string') {
+        try {
+            body = JSON.parse(body);
+        } catch (e) {
+            console.error('Failed to parse shops response string:', e);
+        }
+    }
+    return body as TikTokShopsResponse;
 }
 
 /**

@@ -253,6 +253,7 @@ class AccessTokenTool {
       url: path,
       qs,
       useQuerystring: true,
+      json: true,
     };
 
     return new Promise<{
@@ -306,6 +307,7 @@ class AccessTokenTool {
       url: path,
       qs,
       useQuerystring: true,
+      json: true,
     };
 
     return new Promise<{
