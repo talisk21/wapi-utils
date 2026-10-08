@@ -21,7 +21,7 @@ export default function LogsPage() {
   const [logs, setLogs] = useState<ApiLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'ffn' | 'shopify'>('all');
+  const [filter, setFilter] = useState<'all' | 'ffn' | 'shopify' | 'tiktok'>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
   const [expandedLogId, setExpandedLogId] = useState<string | number | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -136,6 +136,9 @@ export default function LogsPage() {
     if (path.includes('/api/ffn')) {
       return { label: 'FFN', bg: '#6b46c1', color: '#fff' };
     }
+    if (path.includes('tiktok')) {
+      return { label: 'TIKTOK', bg: '#000000', color: '#00f2fe' };
+    }
     if (path.includes('/callback')) {
       return { label: 'SHOPIFY', bg: '#2b6cb0', color: '#fff' };
     }
@@ -221,6 +224,7 @@ export default function LogsPage() {
         {(
           [
             { key: 'all', label: 'All Logs' },
+            { key: 'tiktok', label: 'TikTok Callback (/tiktok-callback)' },
             { key: 'ffn', label: 'FFN Callback (/api/ffn/callback)' },
             { key: 'shopify', label: 'Shopify Callback (/callback)' },
           ] as const
