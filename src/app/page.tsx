@@ -16,7 +16,10 @@ export default function Home() {
               Shopify authentication
             </li>
             <li className='is-link' style={{paddingBottom: '16px'}} onClick={()=>router.push('/tiktok-auth')}>
-              TikTok authentication
+              TikTok authentication (manual test)
+            </li>
+            <li className='is-link' style={{paddingBottom: '16px'}} onClick={()=>router.push('/tiktok-link')}>
+              TikTok Seller Link Generator
             </li>
             <li className='is-link' onClick={()=>router.push('/logs')}>
               Callback & API logs

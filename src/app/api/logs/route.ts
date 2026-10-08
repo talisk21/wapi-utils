@@ -14,7 +14,9 @@ export async function GET(request: NextRequest) {
     if (filter === 'ffn') {
       query = query.ilike('path', '%/api/ffn%');
     } else if (filter === 'shopify') {
-      query = query.ilike('path', '%/callback%').not('path', 'ilike', '%/api/ffn%');
+      query = query.ilike('path', '%/callback%').not('path', 'ilike', '%/api/ffn%').not('path', 'ilike', '%tiktok%');
+    } else if (filter === 'tiktok') {
+      query = query.ilike('path', '%tiktok%');
     }
 
     // Try ordering by 'ts' descending first; if that fails, try 'id', then query without ordering
