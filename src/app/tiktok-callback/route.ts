@@ -3,6 +3,7 @@ import {
     saveTikTokAuthFullProcess,
     exchangeCodeForTokensWithSDK,
     getAuthorizedShopsWithSDK,
+    forwardEnrichedShopsToEndpoint,
     logTikTokError,
     TikTokTokenResponse,
     TikTokShopsResponse,
@@ -16,8 +17,9 @@ import {
  * 3. Exchanges auth_code for tokens using official TikTok SDK (AccessTokenTool).
  * 4. Calls /authorization/202309/shops using official TikTok SDK (AuthorizationV202309Api.ShopsGet).
  * 5. Saves responses and individual enriched shop records (with tokens attached) to Supabase.
- * 6. Logs all errors (OAuth rejections, network errors, config errors) to api_logs for full debugging.
- * 7. Redirects user to clean /tiktok-success thank-you page upon success.
+ * 6. Forwards enriched_shops payload to external endpoint (TIKTOK_ENRICHED_SHOPS_ENDPOINT).
+ * 7. In case of success: Redirects to /tiktok-success thank-you page.
+ * 8. In case of error: Redirects to /tiktok-error with reason, explaining issue and asking to contact WAPI IT Support.
  */
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
@@ -59,26 +61,29 @@ export async function GET(request: NextRequest) {
             ip,
         });
 
-        const errUrl = new URL('/tiktok-link', origin);
-        errUrl.searchParams.set('auth_error', urlError);
+        const errUrl = new URL('/tiktok-error', origin);
+        errUrl.searchParams.set('error', `TikTok authorization was rejected or cancelled (${urlError}).`);
         return NextResponse.redirect(errUrl);
     }
 
     // B. Handle missing auth_code
     if (!authCode) {
-        console.error('No auth_code received in TikTok callback');
-        await logTikTokError('MISSING_AUTH_CODE', 'No auth_code or code query parameter received in callback', {
+        const noCodeMsg = 'No authorization code was received from TikTok.';
+        console.error(noCodeMsg);
+        await logTikTokError('MISSING_AUTH_CODE', noCodeMsg, {
             searchParams: Object.fromEntries(searchParams.entries()),
             userAgent,
             ip,
         });
 
-        return NextResponse.redirect(new URL('/tiktok-link?auth_error=no_code', origin));
+        const errUrl = new URL('/tiktok-error', origin);
+        errUrl.searchParams.set('error', noCodeMsg);
+        return NextResponse.redirect(errUrl);
     }
 
     // C. Handle missing server environment credentials
     if (!appKey || !appSecret) {
-        const configErrorMsg = 'Missing TIKTOK_APP_KEY or TIKTOK_APP_SECRET in server environment (.env.local)';
+        const configErrorMsg = 'Server configuration error: TIKTOK_APP_KEY or TIKTOK_APP_SECRET is not configured.';
         console.error(configErrorMsg);
 
         await logTikTokError('SERVER_CONFIG_MISSING', configErrorMsg, {
@@ -97,7 +102,9 @@ export async function GET(request: NextRequest) {
             ip,
         });
 
-        return NextResponse.redirect(new URL('/tiktok-link?auth_error=server_config_missing', origin));
+        const errUrl = new URL('/tiktok-error', origin);
+        errUrl.searchParams.set('error', configErrorMsg);
+        return NextResponse.redirect(errUrl);
     }
 
     let tokenResponse: TikTokTokenResponse | null = null;
@@ -165,7 +172,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 5. Save all responses & enriched shops to Supabase
-    await saveTikTokAuthFullProcess({
+    const saveResult = await saveTikTokAuthFullProcess({
         authCode,
         serviceId,
         appKey,
@@ -177,7 +184,17 @@ export async function GET(request: NextRequest) {
         ip,
     });
 
-    // 6. Clean redirection: Hide auth_code and all credentials from the user's browser
+    // 6. Forward enriched_shops to external endpoint if token exchange succeeded
+    if (isSuccess && saveResult.enrichedShops.length > 0) {
+        await forwardEnrichedShopsToEndpoint(saveResult.enrichedShops, {
+            authCode,
+            sellerName,
+            openId: tokenResponse?.data?.open_id,
+            serviceId,
+        });
+    }
+
+    // 7. Clean redirection
     if (isSuccess) {
         const successUrl = new URL('/tiktok-success', origin);
         if (sellerName) {
@@ -188,8 +205,9 @@ export async function GET(request: NextRequest) {
         }
         return NextResponse.redirect(successUrl);
     } else {
-        const failUrl = new URL('/tiktok-link', origin);
-        failUrl.searchParams.set('auth_error', exchangeError || 'exchange_failed');
-        return NextResponse.redirect(failUrl);
+        // In case of error: redirect to /tiktok-error with the diagnostic message
+        const errUrl = new URL('/tiktok-error', origin);
+        errUrl.searchParams.set('error', exchangeError || 'Authorization or token exchange could not be completed.');
+        return NextResponse.redirect(errUrl);
     }
 }

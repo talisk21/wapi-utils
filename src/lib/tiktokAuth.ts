@@ -119,6 +119,112 @@ export async function getAuthorizedShopsWithSDK(
 }
 
 /**
+ * Forwards enriched shops payload to an external webhook/endpoint configured in .env.local
+ * (TIKTOK_ENRICHED_SHOPS_ENDPOINT). Logs the request and response in api_logs.
+ */
+export async function forwardEnrichedShopsToEndpoint(
+    enrichedShops: EnrichedShopRecord[],
+    meta: {
+        authCode?: string;
+        sellerName?: string;
+        openId?: string;
+        serviceId?: string;
+    }
+) {
+    const endpointUrl = process.env.TIKTOK_ENRICHED_SHOPS_ENDPOINT;
+    if (!endpointUrl) {
+        console.log('[forwardEnrichedShopsToEndpoint] No endpoint defined (TIKTOK_ENRICHED_SHOPS_ENDPOINT). Skipping forward.');
+        return { forwarded: false, reason: 'ENDPOINT_NOT_CONFIGURED' };
+    }
+
+    // Send the enriched_shops array directly as requested
+    const payload = enrichedShops;
+
+    const startedAt = Date.now();
+    try {
+        const response = await fetch(endpointUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'WAPI-TikTok-Integration/1.0',
+                'X-WAPI-Seller-Name': encodeURIComponent(meta.sellerName || ''),
+                'X-WAPI-Open-ID': encodeURIComponent(meta.openId || ''),
+                'X-WAPI-Auth-Code': encodeURIComponent(meta.authCode || ''),
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const durationMs = Date.now() - startedAt;
+        let responseBody: any = null;
+        try {
+            responseBody = await response.json();
+        } catch {
+            try {
+                responseBody = await response.text();
+            } catch {
+                responseBody = null;
+            }
+        }
+
+        // Log the forwarding attempt to api_logs
+        await supabase.from('api_logs').insert([
+            {
+                method: 'POST_FORWARD_SHOPS',
+                path: endpointUrl,
+                status: response.status,
+                duration_ms: durationMs,
+                user_agent: 'WAPI-TikTok-Integration/1.0',
+                req: {
+                    type: 'forward_enriched_shops_result',
+                    endpoint: endpointUrl,
+                    status: response.status,
+                    ok: response.ok,
+                    response_body: responseBody,
+                    payload_summary: {
+                        shops_count: enrichedShops.length,
+                        seller_name: meta.sellerName,
+                    },
+                },
+            },
+        ]);
+
+        return {
+            forwarded: true,
+            status: response.status,
+            ok: response.ok,
+            responseBody,
+        };
+    } catch (err: any) {
+        const durationMs = Date.now() - startedAt;
+        console.error(`[forwardEnrichedShopsToEndpoint] Failed posting to ${endpointUrl}:`, err?.message);
+
+        await supabase.from('api_logs').insert([
+            {
+                method: 'POST_FORWARD_SHOPS_ERROR',
+                path: endpointUrl,
+                status: 500,
+                duration_ms: durationMs,
+                user_agent: 'WAPI-TikTok-Integration/1.0',
+                req: {
+                    type: 'forward_enriched_shops_error',
+                    endpoint: endpointUrl,
+                    error: err?.message || 'Network request failed',
+                    payload_summary: {
+                        shops_count: enrichedShops.length,
+                        seller_name: meta.sellerName,
+                    },
+                },
+            },
+        ]);
+
+        return {
+            forwarded: false,
+            error: err?.message,
+        };
+    }
+}
+
+/**
  * Explicit helper to log errors with full diagnostic context into Supabase api_logs.
  */
 export async function logTikTokError(stage: string, errorDetail: any, context?: Record<string, any>) {
@@ -155,6 +261,7 @@ export async function logTikTokError(stage: string, errorDetail: any, context?: 
 /**
  * Saves initial token response and individual enriched shop records into Supabase.
  * Each shop has tokens_received attached as an extra property.
+ * Returns the generated enrichedShops array.
  */
 export async function saveTikTokAuthFullProcess(data: {
     authCode?: string;
@@ -166,7 +273,7 @@ export async function saveTikTokAuthFullProcess(data: {
     success?: boolean;
     ip?: string | null;
     userAgent?: string | null;
-}) {
+}): Promise<{ savedTo: string | null; enrichedShops: EnrichedShopRecord[] }> {
     const nowIso = new Date().toISOString();
     const tokenData = data.tokenResponse?.data;
     const shopsList: TikTokShop[] = data.shopsResponse?.data?.shops || [];
@@ -245,7 +352,7 @@ export async function saveTikTokAuthFullProcess(data: {
             .insert([dedicatedPayload]);
 
         if (!dedicatedErr) {
-            return { savedTo: 'tiktok_authorizations', enrichedCount: enrichedShops.length };
+            return { savedTo: 'tiktok_authorizations', enrichedShops };
         }
     } catch (err: any) {
         console.warn('Dedicated table save notice (falling back):', err?.message);
@@ -283,12 +390,12 @@ export async function saveTikTokAuthFullProcess(data: {
         const { error: logErr } = await supabase.from('api_logs').insert([logEntry]);
         if (logErr) {
             console.error('Failed to save to api_logs:', logErr.message);
-            return { savedTo: null, error: logErr.message };
+            return { savedTo: null, enrichedShops };
         }
 
-        return { savedTo: 'api_logs', enrichedCount: enrichedShops.length };
+        return { savedTo: 'api_logs', enrichedShops };
     } catch (fallbackErr: any) {
         console.error('Fatal error saving token and shops record:', fallbackErr?.message);
-        return { savedTo: null, error: fallbackErr?.message };
+        return { savedTo: null, enrichedShops };
     }
 }
